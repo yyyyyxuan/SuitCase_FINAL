@@ -282,3 +282,6 @@ namespace SuitCase_FINAL
         }
     }
 }
+//Duration of Read/Write functions individually take around 20ms approx
+//Cannot connect to modbus server, connecting to wise device individually
+//400+ms delay due to if statements?
