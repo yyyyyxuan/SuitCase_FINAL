@@ -47,9 +47,9 @@ namespace SuitCase_FINAL
             using (TcpClient client = new TcpClient("192.168.1.103", 502))
             {
                 long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                var factory = new ModbusFactory();
+                var factory = new ModbusFactory();//container for modbus function services
                 IModbusMaster master = factory.CreateMaster(client);
-                bool[] coils = master.ReadCoils(0, 0, 2);//0,start,how many
+                bool[] coils = master.ReadCoils(0, 0, 2);//address of device,start address,how many
                 UInt16[] register = master.ReadInputRegisters(0, 0, 1);
                 ON = coils[0];
                 OFF = coils[1];
@@ -285,3 +285,4 @@ namespace SuitCase_FINAL
 //Duration of Read/Write functions individually take around 20ms approx
 //Cannot connect to modbus server, connecting to wise device individually
 //400+ms delay due to if statements?
+//NModbus doc https://nmodbus.github.io/api/NModbus.html
