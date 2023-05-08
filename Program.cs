@@ -165,9 +165,9 @@ namespace SuitCase_FINAL
                 timerNA.Stop();
                 timerH.Start();
             }
-            Active = timerA.Elapsed.Seconds;
-            NotActive = timerNA.Elapsed.Seconds;
-            HaltTime = timerH.Elapsed.Seconds;
+            Active = Convert.ToInt32(timerA.Elapsed.TotalSeconds);
+            NotActive = Convert.ToInt32(timerNA.Elapsed.TotalSeconds);
+            HaltTime = Convert.ToInt32(timerH.Elapsed.TotalSeconds);
         }
 
         public void Post()//Update constant tags on webaccess
