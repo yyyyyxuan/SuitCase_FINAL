@@ -21,7 +21,7 @@ namespace SuitCase_FINAL.data
             this.Wise4060address = "192.168.1.101";
             this.ModBusPort = 502;
 
-            WebAccessSetTagAPI= "http://localhost/WaWebService/Json/SetTagValue/SuitCase"
+            WebAccessSetTagAPI = "http://localhost/WaWebService/Json/SetTagValue/SuitCase";
 
         }
     }

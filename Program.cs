@@ -41,9 +41,9 @@ namespace SuitCase_FINAL
         
         public Program()//Start running system
         {
-            this.Write4012("ON");
-            this.Write4060("ON");
-            this.RunTime();
+            Write4012("ON");
+            Write4060("ON");
+            RunTime();
         }
         public void Read4012()
         {
@@ -235,6 +235,7 @@ namespace SuitCase_FINAL
                     program.ReadESP();
                     program.ProductCounter();
                     program.Post();
+                    /*
                     Console.WriteLine("On: " + program.ON + "\n" +
                                       "Off: " + program.OFF + "\n" +
                                       "DS:" + program.DS + "\n" +
@@ -248,7 +249,7 @@ namespace SuitCase_FINAL
                                       "Time taken Read 4012: " + program.TimeTakenRead4012 + "\n" +
                                       "Time taken Write 4012: " + program.TimeTakenWrite4012 + "\n" +
                                       "Time taken Write 4060: " + program.TimeTakenWrite4060 + "\n" +
-                                      "Time taken Read ESP: " + program.TimeTakenReadESP + "\n");
+                                      "Time taken Read ESP: " + program.TimeTakenReadESP + "\n");*/
 
                     if (program.DS >= 2000)
                     {
