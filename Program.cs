@@ -10,10 +10,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using NModbus;
+using SuitCase_FINAL.data;//config
 namespace SuitCase_FINAL
 {
     internal class Program
     {
+        
+        config config = new config();
+        
         private int Active, NotActive, HaltTime;//Duration
         private int PassCount, DefectCount, HaltCount = 0;//Count of
         private bool ON, OFF, HaltFlag = false;//ON/OFF status of switch
@@ -33,18 +37,18 @@ namespace SuitCase_FINAL
         Stopwatch timerA = new Stopwatch();//Active
         Stopwatch timerNA = new Stopwatch();//NotActive
         Stopwatch timerH = new Stopwatch();// Halt Time
-
-
+        
+        
         public Program()//Start running system
         {
-            Write4012("ON");
-            Write4060("ON");
-            RunTime();
+            this.Write4012("ON");
+            this.Write4060("ON");
+            this.RunTime();
         }
         public void Read4012()
         {
 
-            using (TcpClient client = new TcpClient("192.168.1.103", 502))
+            using (TcpClient client = new TcpClient(config.Wise4012address, config.ModBusPort))
             {
                 long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 var factory = new ModbusFactory();//container for modbus function services
@@ -61,7 +65,7 @@ namespace SuitCase_FINAL
         }
         public void ReadESP()
         {
-            using (TcpClient client = new TcpClient("192.168.1.214", 502))
+            using (TcpClient client = new TcpClient(config.ESPaddress, config.ModBusPort))
             {
                 long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 var factory = new ModbusFactory();
@@ -76,7 +80,7 @@ namespace SuitCase_FINAL
 
         private void Write4012(string x)
         {
-            using (TcpClient client = new TcpClient("192.168.1.103", 502))
+            using (TcpClient client = new TcpClient(config.Wise4012address, config.ModBusPort))
             {
                 long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 var factory = new ModbusFactory();
@@ -99,7 +103,7 @@ namespace SuitCase_FINAL
         }
         private void Write4060(string x)
         {
-            using (TcpClient client = new TcpClient("192.168.1.101", 502))
+            using (TcpClient client = new TcpClient(config.Wise4060address, config.ModBusPort))
             {
                 long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 var factory = new ModbusFactory();
@@ -203,7 +207,7 @@ namespace SuitCase_FINAL
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                 var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var responseTask = httpClient.PostAsync("http://localhost/WaWebService/Json/SetTagValue/SuitCase", content);
+                var responseTask = httpClient.PostAsync(config.WebAccessSetTagAPI, content);
                 var response = responseTask.Result;
                 httpClient.Dispose();
             }
