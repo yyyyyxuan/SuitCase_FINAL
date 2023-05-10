@@ -1,49 +1,116 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SuitCase_FINAL.data;
+using NModbus;
+using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using NModbus;
-using SuitCase_FINAL.data;//config
 namespace SuitCase_FINAL
 {
+
+    internal class Run
+    {
+        public static int FuncRun(Program program)
+        {
+            try
+            {
+                program.Read4012();
+                program.RunTime();
+                program.ReadESP();
+                program.ProductCounter();
+                program.Post();
+                /*Console.WriteLine("On: " + program.ON + "\n" +
+                                      "Off: " + program.OFF + "\n" +
+                                      "DS:" + program.DS + "\n" +
+                                      "Temp:" + program.TemperatureVal + "\n" +
+                                      "Active:" + program.Active + "\n" +
+                                      "Not Active:" + program.NotActive + "\n" +
+                                      "Halt Time:" + program.HaltTime + "\n" +
+                                      "Pass Count:" + program.PassCount + "\n" +
+                                      "Defect Count:" + program.DefectCount + "\n" +
+                                      "Halt Count:" + program.HaltCount + "\n" +
+                                      "Time taken Read 4012: " + program.TimeTakenRead4012 + "\n" +
+                                      "Time taken Write 4012: " + program.TimeTakenWrite4012 + "\n" +
+                                      "Time taken Write 4060: " + program.TimeTakenWrite4060 + "\n" +
+                                      "Time taken Read ESP: " + program.TimeTakenReadESP + "\n");*/
+                if (program.DS >= 2000)
+                {
+                    program.Write4012("HALT");
+                    program.Write4060("HALT");
+                    program.STATUS = "HALT";
+                    if (!program.HaltFlag)
+                    {
+                        program.HaltFlag = true;
+                        program.HaltCount++;
+                    }
+                }
+                if (program.ON == true)
+                {
+                    program.Write4012("ON");
+                    program.Write4060("ON");
+                    program.STATUS = "ON";
+                    program.HaltFlag = false;
+                }
+                if (program.OFF == true)
+                {
+                    program.Write4012("OFF");
+                    program.Write4060("OFF");
+                    program.STATUS = "OFF";
+                    program.HaltFlag = false;
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return 0;
+        }
+        public static void Main(string[] args)
+        {
+            Program program = new Program();
+            Timer timer = new Timer();
+            timer.Interval = 200;
+            timer.Elapsed += (sender, e) => FuncRun(program);
+
+            timer.Start();
+            Console.ReadLine();
+        }
+    }
+
     internal class Program
     {
-        
+
         config config = new config();
-        
-        private int Active, NotActive, HaltTime;//Duration
-        private int PassCount, DefectCount, HaltCount = 0;//Count of
-        private bool ON, OFF, HaltFlag = false;//ON/OFF status of switch
-        private string STATUS = "ON";//Status of system
-        private UInt16 DS = 0;//Distance sensor val
-        private float TemperatureVal = 0;
-        private long TimeTakenRead4012 = 0;
-        private long TimeTakenWrite4012 = 0;
-        private long TimeTakenWrite4060 = 0;
-        private long TimeTakenReadESP = 0;
-        private long endReadESP = 0;
-        private long endRead4012 = 0;
-        private long endWrite4012 = 0;
-        private long endWrite4060 = 0;
-        private long endProduct = 0;
+
+        public int Active, NotActive, HaltTime;//Duration
+        public int PassCount, DefectCount, HaltCount = 0;//Count of
+        public bool ON, OFF, HaltFlag = false;//ON/OFF status of switch
+        public string STATUS = "ON";//Status of system
+        public UInt16 DS = 0;//Distance sensor val
+        public float TemperatureVal = 0;
+        public long TimeTakenRead4012 = 0;
+        public long TimeTakenWrite4012 = 0;
+        public long TimeTakenWrite4060 = 0;
+        public long TimeTakenReadESP = 0;
+        public long endReadESP = 0;
+        public long endRead4012 = 0;
+        public long endWrite4012 = 0;
+        public long endWrite4060 = 0;
+        public long endProduct = 0;
         Random random = new Random();
         Stopwatch timerA = new Stopwatch();//Active
         Stopwatch timerNA = new Stopwatch();//NotActive
         Stopwatch timerH = new Stopwatch();// Halt Time
-        
-        
+
+
         public Program()//Start running system
         {
-            Write4012("ON");
-            Write4060("ON");
-            RunTime();
+            this.Write4012("ON");
+            this.Write4060("ON");
+            this.RunTime();
         }
         public void Read4012()
         {
@@ -78,7 +145,7 @@ namespace SuitCase_FINAL
             }
         }
 
-        private void Write4012(string x)
+        public void Write4012(string x)
         {
             using (TcpClient client = new TcpClient(config.Wise4012address, config.ModBusPort))
             {
@@ -101,7 +168,7 @@ namespace SuitCase_FINAL
                 endWrite4012 = start;
             }
         }
-        private void Write4060(string x)
+        public void Write4060(string x)
         {
             using (TcpClient client = new TcpClient(config.Wise4060address, config.ModBusPort))
             {
@@ -217,77 +284,5 @@ namespace SuitCase_FINAL
                 Console.WriteLine("Failed to post to WA\n");
             }
         }
-
-
-
-        private static async Task<int> Main(string[] args)
-        {
-            Program program = new Program();
-
-            while (true)
-            {
-                try
-                {
-
-                    await Task.Run(() => { });
-                    program.Read4012();
-                    program.RunTime();
-                    program.ReadESP();
-                    program.ProductCounter();
-                    program.Post();
-                    /*
-                    Console.WriteLine("On: " + program.ON + "\n" +
-                                      "Off: " + program.OFF + "\n" +
-                                      "DS:" + program.DS + "\n" +
-                                      "Temp:" + program.TemperatureVal + "\n" +
-                                      "Active:" + program.Active + "\n" +
-                                      "Not Active:" + program.NotActive + "\n" +
-                                      "Halt Time:" + program.HaltTime + "\n" +
-                                      "Pass Count:" + program.PassCount + "\n" +
-                                      "Defect Count:" + program.DefectCount + "\n" +
-                                      "Halt Count:" + program.HaltCount + "\n" +
-                                      "Time taken Read 4012: " + program.TimeTakenRead4012 + "\n" +
-                                      "Time taken Write 4012: " + program.TimeTakenWrite4012 + "\n" +
-                                      "Time taken Write 4060: " + program.TimeTakenWrite4060 + "\n" +
-                                      "Time taken Read ESP: " + program.TimeTakenReadESP + "\n");*/
-
-                    if (program.DS >= 2000)
-                    {
-                        program.Write4012("HALT");
-                        program.Write4060("HALT");
-                        program.STATUS = "HALT";
-                        if (!program.HaltFlag)
-                        {
-                            program.HaltFlag = true;
-                            program.HaltCount++;
-                        }
-                    }
-                    if (program.ON == true)
-                    {
-                        program.Write4012("ON");
-                        program.Write4060("ON");
-                        program.STATUS = "ON";
-                        program.HaltFlag = false;
-                    }
-                    if (program.OFF == true)
-                    {
-                        program.Write4012("OFF");
-                        program.Write4060("OFF");
-                        program.STATUS = "OFF";
-                        program.HaltFlag = false;
-                    }
-                }
-
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-
-        }
     }
 }
-//Duration of Read/Write functions individually take around 20ms approx
-//Cannot connect to modbus server, connecting to wise device individually
-//400+ms delay due to if statements?
-//NModbus doc https://nmodbus.github.io/api/NModbus.html
